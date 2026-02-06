@@ -49,7 +49,7 @@ const HUD: React.FC<HUDProps> = ({
     const dx = touch.clientX - touchStart.x;
     const dy = touch.clientY - touchStart.y;
     const dist = Math.sqrt(dx*dx + dy*dy);
-    const maxDist = 80;
+    const maxDist = 60;
     
     const limitedDist = Math.min(dist, maxDist);
     const angle = Math.atan2(dy, dx);
@@ -67,7 +67,7 @@ const HUD: React.FC<HUDProps> = ({
   };
 
   return (
-    <div className="absolute inset-0 pointer-events-none p-3 sm:p-4 md:p-8 flex flex-col justify-between text-[#1a1a1a] font-orbitron select-none">
+    <div className="absolute inset-0 pointer-events-none p-2 sm:p-3 md:p-8 flex flex-col justify-between text-[#1a1a1a] font-orbitron select-none">
       
       {/* Top Section */}
       <div className="flex justify-between items-start z-10">
@@ -122,16 +122,16 @@ const HUD: React.FC<HUDProps> = ({
       </div>
 
       {/* Mobile Input Surface */}
-      <div className="absolute inset-0 flex items-end justify-between p-8 pointer-events-none">
+      <div className="absolute inset-0 flex items-end justify-between p-4 sm:p-6 md:p-8 pointer-events-none">
         {mobile && (
            <div 
-             className="w-64 h-64 rounded-full bg-white/5 border-2 border-white/10 relative pointer-events-auto flex items-center justify-center backdrop-blur-sm"
+             className="w-32 h-32 sm:w-44 sm:h-44 md:w-56 md:h-56 rounded-full bg-white/5 border-2 border-white/10 relative pointer-events-auto flex items-center justify-center backdrop-blur-sm"
              onTouchStart={handleJoystickStart}
              onTouchMove={handleJoystickMove}
              onTouchEnd={handleJoystickEnd}
            >
              <div 
-               className="w-24 h-24 rounded-full bg-white shadow-2xl absolute flex items-center justify-center border-2 border-cyan-500"
+               className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-white shadow-2xl absolute flex items-center justify-center border-2 border-cyan-500"
                style={{ transform: `translate(${joystickPos.x}px, ${joystickPos.y}px)` }}
              >
                 <div className="w-14 h-14 border-4 border-cyan-500 rounded-full opacity-20"></div>
@@ -140,18 +140,18 @@ const HUD: React.FC<HUDProps> = ({
         )}
 
         {mobile && (
-           <div className="flex flex-col gap-8 pointer-events-auto items-center">
+           <div className="flex flex-col gap-4 sm:gap-6 pointer-events-auto items-center">
               <button 
                 onPointerDown={onJumpPress}
-                className="w-32 h-32 rounded-full bg-white/95 border-4 border-cyan-500 flex items-center justify-center shadow-2xl active:scale-90 transition-transform"
+                className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full bg-white/95 border-4 border-cyan-500 flex items-center justify-center shadow-2xl active:scale-90 transition-transform"
               >
-                <span className="text-3xl font-black italic text-cyan-600">ASCEND</span>
+                <span className="text-lg sm:text-2xl md:text-3xl font-black italic text-cyan-600">ASCEND</span>
               </button>
               <button 
                 onPointerDown={onSuperJumpPress}
-                className={`w-24 h-24 rounded-full border-4 flex items-center justify-center shadow-2xl active:scale-90 transition-all ${stats.superJumpReady ? 'bg-pink-600 border-white text-white' : 'bg-gray-200 border-gray-400 text-gray-400'}`}
+                className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full border-4 flex items-center justify-center shadow-2xl active:scale-90 transition-all ${stats.superJumpReady ? 'bg-pink-600 border-white text-white' : 'bg-gray-200 border-gray-400 text-gray-400'}`}
               >
-                <span className="text-[10px] font-black text-center">FORCE<br/>PULSE</span>
+                <span className="text-[8px] sm:text-[9px] font-black text-center leading-tight">FORCE<br/>PULSE</span>
               </button>
            </div>
         )}
@@ -159,20 +159,20 @@ const HUD: React.FC<HUDProps> = ({
 
       {/* Speedometer Footer */}
       <div className="flex justify-between items-end z-10">
-        <div className="w-full max-w-sm bg-white/95 p-6 md:p-8 shadow-2xl border-t-8 border-cyan-500 relative rounded-sm">
+        <div className="w-full max-w-xs sm:max-w-sm bg-white/95 p-3 sm:p-5 md:p-8 shadow-2xl border-t-8 border-cyan-500 relative rounded-sm">
           <div className="flex justify-between items-end mb-4">
              <div>
-                <p className="text-[10px] font-bold text-cyan-600 tracking-[0.5em] uppercase mb-1">Kinetic Output</p>
-                <div className="flex items-baseline gap-2">
-                   <h2 className={`text-7xl font-black italic tracking-tighter transition-all tabular-nums ${isExtreme ? 'text-pink-600 drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]' : 'text-gray-900'}`}>
+                <p className="text-[8px] sm:text-[9px] md:text-[10px] font-bold text-cyan-600 tracking-[0.4em] sm:tracking-[0.5em] uppercase mb-1">Kinetic Output</p>
+                <div className="flex items-baseline gap-1 sm:gap-2">
+                   <h2 className={`text-4xl sm:text-6xl md:text-7xl font-black italic tracking-tighter transition-all tabular-nums ${isExtreme ? 'text-pink-600 drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]' : 'text-gray-900'}`}>
                     {speedKmh}
                    </h2>
-                   <span className="text-sm font-bold opacity-30 italic">KM/H</span>
+                   <span className="text-xs sm:text-sm font-bold opacity-30 italic">KM/H</span>
                 </div>
              </div>
           </div>
 
-          <div className="h-3 bg-gray-100 rounded-full overflow-hidden mb-3">
+          <div className="h-2 sm:h-3 bg-gray-100 rounded-full overflow-hidden mb-3">
              <div 
                className={`h-full transition-all duration-300 ${isExtreme ? 'bg-pink-500' : 'bg-cyan-500'}`}
                style={{ width: `${flowProgress}%` }}
