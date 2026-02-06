@@ -46,44 +46,137 @@ const Level: React.FC<LevelProps> = ({ onFinish, theme, difficulty, stage }) => 
 };
 
 const Course = ({ onFinish, colors, params, theme, stage }: any) => {
-  const gM = params.gapMult;
-  const sM = params.sizeMult;
-  const stageZOffset = (stage - 1) * -300;
+  const baseGap = params.gapMult;
+  const baseSize = params.sizeMult;
+
+  // Phase-specific modifiers so each stage feels distinct
+  const phaseIndex = (stage - 1) % 3; // cycles 0,1,2
+  const stageIntensity = 1 + (stage - 1) * 0.12; // ramps difficulty each phase
+
+  const gapBoost = baseGap * stageIntensity;
+  const sizeAdjust =
+    baseSize *
+    (phaseIndex === 0 ? 1.0 : phaseIndex === 1 ? 0.9 : 0.8);
+
+  const verticalBoost = (stage - 1) * 6;
+  const phaseSpacing = 260 + (stage - 1) * 80;
+  const stageZOffset = (stage - 1) * -phaseSpacing;
 
   return (
     <group>
       {/* START PLATFORM */}
-      <Platform pos={[0, -2, 0]} size={[120 * sM, 4, 120 * sM]} color={colors.platform} hasSupports colors={colors} props count={20} />
+      <Platform
+        pos={[0, -2 + verticalBoost * 0.1, 0]}
+        size={[120 * sizeAdjust, 4, 120 * sizeAdjust]}
+        color={colors.platform}
+        hasSupports
+        colors={colors}
+        props
+        count={20}
+      />
       
       {/* FIRST LEG - Ascending path */}
-      <Bridge start={[0, 0, -60]} end={[0, 20, -180 * gM + stageZOffset]} width={14 * sM} color={colors.platform} accent={colors.accent} />
+      <Bridge
+        start={[0, 0 + verticalBoost * 0.15, -60]}
+        end={[0, 20 + verticalBoost * 0.15, -180 * gapBoost + stageZOffset]}
+        width={14 * sizeAdjust}
+        color={colors.platform}
+        accent={colors.accent}
+      />
       
       {/* CLUSTER 1 - Verticality */}
-      <group position={[0, 20, -260 * gM + stageZOffset]}>
-         <Platform pos={[0, 0, 0]} size={[70 * sM, 3, 70 * sM]} color={colors.platform} accent={colors.accent} hasSupports colors={colors} props count={10} />
-         <Platform pos={[50 * gM, 35, 20]} size={[35 * sM, 2, 35 * sM]} color={colors.platform} accent={colors.accent} colors={colors} props count={6} />
-         <Platform pos={[-50 * gM, 55, 40]} size={[35 * sM, 2, 35 * sM]} color={colors.platform} accent={colors.accent} colors={colors} props count={6} />
-         <Bridge start={[50 * gM, 35, 20]} end={[-50 * gM, 55, 40]} width={6 * sM} color={colors.platform} />
+      <group position={[0, 20 + verticalBoost * 0.25, -260 * gapBoost + stageZOffset]}>
+         <Platform
+           pos={[0, 0, 0]}
+           size={[70 * sizeAdjust, 3, 70 * sizeAdjust]}
+           color={colors.platform}
+           accent={colors.accent}
+           hasSupports
+           colors={colors}
+           props
+           count={10}
+         />
+         <Platform
+           pos={[50 * gapBoost, 35 + verticalBoost * 0.25, 20]}
+           size={[35 * sizeAdjust, 2, 35 * sizeAdjust]}
+           color={colors.platform}
+           accent={colors.accent}
+           colors={colors}
+           props
+           count={6}
+         />
+         <Platform
+           pos={[-50 * gapBoost, 55 + verticalBoost * 0.25, 40]}
+           size={[35 * sizeAdjust, 2, 35 * sizeAdjust]}
+           color={colors.platform}
+           accent={colors.accent}
+           colors={colors}
+           props
+           count={6}
+         />
+         <Bridge
+           start={[50 * gapBoost, 35 + verticalBoost * 0.25, 20]}
+           end={[-50 * gapBoost, 55 + verticalBoost * 0.25, 40]}
+           width={6 * sizeAdjust}
+           color={colors.platform}
+         />
       </group>
 
       {/* LONG STRAIGHT BRIDGE - Sprint Zone */}
-      <Bridge start={[0, 55, -320 * gM + stageZOffset]} end={[0, 75, -600 * gM + stageZOffset]} width={20 * sM} color={colors.platform} accent={colors.accent} />
+      <Bridge
+        start={[0, 55 + verticalBoost * 0.4, -320 * gapBoost + stageZOffset]}
+        end={[0, 75 + verticalBoost * 0.4, -600 * gapBoost + stageZOffset]}
+        width={20 * sizeAdjust}
+        color={colors.platform}
+        accent={colors.accent}
+      />
       
       {/* OBSTACLE HUB - Wall runs and high ground */}
-      <group position={[0, 75, -700 * gM + stageZOffset]}>
-         <Platform pos={[0, 0, 0]} size={[120 * sM, 5, 150 * sM]} color={colors.platform} hasSupports colors={colors} props count={30} />
+      <group position={[0, 75 + verticalBoost * 0.5, -700 * gapBoost + stageZOffset]}>
+         <Platform
+           pos={[0, 0, 0]}
+           size={[120 * sizeAdjust, 5, 150 * sizeAdjust]}
+           color={colors.platform}
+           hasSupports
+           colors={colors}
+           props
+           count={30}
+         />
          {/* Side walls for wall running */}
-         <Platform pos={[-60 * sM, 35, 0]} size={[3, 70, 150 * sM]} color={colors.platform} accent={colors.accent} colors={colors} />
-         <Platform pos={[60 * sM, 35, 0]} size={[3, 70, 150 * sM]} color={colors.platform} accent={colors.accent} colors={colors} />
+         <Platform
+           pos={[-60 * sizeAdjust, 35 + verticalBoost * 0.5, 0]}
+           size={[3, 70, 150 * sizeAdjust]}
+           color={colors.platform}
+           accent={colors.accent}
+           colors={colors}
+         />
+         <Platform
+           pos={[60 * sizeAdjust, 35 + verticalBoost * 0.5, 0]}
+           size={[3, 70, 150 * sizeAdjust]}
+           color={colors.platform}
+           accent={colors.accent}
+           colors={colors}
+         />
          {/* Floating obstacles over bridge */}
-         <Platform pos={[0, 30, 0]} size={[20, 2, 20]} color={colors.platform} accent={colors.accent} />
+         <Platform
+           pos={[0, 30 + verticalBoost * 0.4, 0]}
+           size={[20, 2, 20]}
+           color={colors.platform}
+           accent={colors.accent}
+         />
       </group>
 
       {/* FINAL MASSIVE BRIDGE CONNECTING TO FINISH */}
-      <Bridge start={[0, 75, -780 * gM + stageZOffset]} end={[0, 120, -1050 * gM + stageZOffset]} width={30 * sM} color={colors.platform} accent={colors.accent} />
+      <Bridge
+        start={[0, 75 + verticalBoost * 0.6, -780 * gapBoost + stageZOffset]}
+        end={[0, 120 + verticalBoost * 0.6, -1050 * gapBoost + stageZOffset]}
+        width={30 * sizeAdjust}
+        color={colors.platform}
+        accent={colors.accent}
+      />
 
       {/* FINISH ZONE - Goal */}
-      <group position={[0, 120, -1300 * gM + stageZOffset]}>
+      <group position={[0, 120 + verticalBoost * 0.7, -1300 * gapBoost + stageZOffset]}>
         <Platform pos={[0, 0, 0]} size={[400, 20, 400]} color={colors.platform} accent={colors.accent} onCollide={onFinish} hasSupports colors={colors} props count={80} />
         {/* Epic Finish Banner Structure */}
         <group position={[0, 30, 160]}>

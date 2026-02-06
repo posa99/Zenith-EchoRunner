@@ -15,18 +15,20 @@ interface ParkourGameProps {
   characterStyle: CharacterStyle;
   pov: CameraPOV;
   stage: number;
+  runId: number;
 }
 
 const ParkourGame: React.FC<ParkourGameProps> = ({ 
-  isPaused, onUpdateStats, onFinish, joystickData, theme, difficulty, characterStyle, pov, stage 
+  isPaused, onUpdateStats, onFinish, joystickData, theme, difficulty, characterStyle, pov, stage, runId 
 }) => {
   const timeRef = useRef(0);
   const finished = useRef(false);
 
-  // Reset internal finish state on stage update
+  // Reset internal finish state and timer when stage or run changes
   useEffect(() => {
     finished.current = false;
-  }, [stage]);
+    timeRef.current = 0;
+  }, [stage, runId]);
 
   useFrame((state, delta) => {
     if (isPaused || finished.current) return;

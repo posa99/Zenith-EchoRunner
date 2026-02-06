@@ -24,18 +24,18 @@ const MainMenu: React.FC<MainMenuProps> = ({ onStart, settings, onSettingsChange
       </div>
 
       {!showSettings ? (
-        <div className="relative text-center z-10 w-full max-w-5xl py-12">
+        <div className="relative text-center z-10 w-full max-w-5xl py-10 sm:py-12">
           <div className="mb-8 inline-block bg-[#1a1a1a] text-cyan-400 px-8 py-3 text-xs font-black tracking-[0.8em] uppercase italic animate-pulse shadow-2xl border-l-8 border-cyan-500">
             ZENITH CORE v5.2 // LINK ESTABLISHED
           </div>
-          <h1 className="text-8xl md:text-[16rem] font-orbitron font-black tracking-tighter text-[#1a1a1a] leading-[0.75] mb-12 italic drop-shadow-2xl">
+          <h1 className="text-5xl sm:text-7xl md:text-[16rem] font-orbitron font-black tracking-tighter text-[#1a1a1a] leading-[0.8] md:leading-[0.75] mb-10 md:mb-12 italic drop-shadow-2xl">
             ECH<span className="text-cyan-500">O</span><br/>RUN
           </h1>
           
-          <div className="flex flex-col gap-6 max-w-md mx-auto">
+          <div className="flex flex-col gap-4 sm:gap-6 max-w-md mx-auto">
             <button 
               onClick={onStart}
-              className="group relative px-20 py-10 bg-[#1a1a1a] text-white font-orbitron font-black text-4xl transition-all hover:bg-cyan-600 shadow-[0_30px_60px_rgba(0,0,0,0.3)] hover:-translate-y-2 active:translate-y-0 border-b-8 border-cyan-800"
+              className="group relative px-10 sm:px-20 py-6 sm:py-8 md:py-10 bg-[#1a1a1a] text-white font-orbitron font-black text-2xl sm:text-3xl md:text-4xl transition-all hover:bg-cyan-600 shadow-[0_30px_60px_rgba(0,0,0,0.3)] hover:-translate-y-2 active:translate-y-0 border-b-8 border-cyan-800"
             >
               INITIALIZE SYNC
               <div className="absolute -inset-2 border-2 border-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity scale-105"></div>

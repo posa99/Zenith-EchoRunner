@@ -12,6 +12,9 @@ const App: React.FC = () => {
   const [isPaused, setIsPaused] = useState(true);
   const [gameOver, setGameOver] = useState(false);
   const [stage, setStage] = useState(1);
+  const [runId, setRunId] = useState(0);
+  const [showStageComplete, setShowStageComplete] = useState(false);
+  const [stageCompleteTime, setStageCompleteTime] = useState<number | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   
   // Fix: Added missing joystickData state for mobile controls to resolve reference errors
@@ -55,12 +58,49 @@ const App: React.FC = () => {
     setGameOver(false);
     setGameStarted(true);
     setIsPaused(false);
+    setShowStageComplete(false);
     setStage(1);
+    setRunId(prev => prev + 1);
     setStats({ speed: 0, time: 0, checkpoints: 0, score: 0, combo: 0, superJumpReady: true, superJumpCooldown: 0, stage: 1 });
   }, []);
 
-  const handleNextStage = useCallback(() => {
+  const handleStageComplete = useCallback((time: number) => {
+    setIsPaused(true);
+    setShowStageComplete(true);
+    setStageCompleteTime(time);
+  }, []);
+
+  const goToNextStage = useCallback(() => {
     setStage(prev => prev + 1);
+    setShowStageComplete(false);
+    setStageCompleteTime(null);
+    setIsPaused(false);
+    setRunId(prev => prev + 1);
+  }, []);
+
+  const restartCurrentStage = useCallback(() => {
+    setShowStageComplete(false);
+    setStageCompleteTime(null);
+    setIsPaused(false);
+    setRunId(prev => prev + 1);
+    setStats(prev => ({
+      ...prev,
+      speed: 0,
+      time: 0,
+      score: 0,
+      combo: 0,
+      superJumpReady: true,
+      superJumpCooldown: 0
+    }));
+  }, []);
+
+  const quitToMenu = useCallback(() => {
+    setGameStarted(false);
+    setIsPaused(true);
+    setShowStageComplete(false);
+    setStageCompleteTime(null);
+    setStage(1);
+    setStats({ speed: 0, time: 0, checkpoints: 0, score: 0, combo: 0, superJumpReady: true, superJumpCooldown: 0, stage: 1 });
   }, []);
 
   const requestLock = useCallback(() => {
@@ -116,6 +156,39 @@ const App: React.FC = () => {
         </div>
       )}
 
+      {showStageComplete && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-3xl p-4">
+          <div className="text-center text-white p-8 max-w-2xl w-full bg-[#05060a]/90 border-b-8 border-cyan-500 rounded-lg">
+            <h2 className="text-5xl md:text-7xl font-orbitron font-black mb-4 text-cyan-400 italic tracking-tighter">
+              PHASE {stage} CLEARED
+            </h2>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-gray-400 mb-6">
+              {stageCompleteTime !== null ? `Sync time ${stageCompleteTime.toFixed(2)}s` : `Sync complete`}
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <button
+                onClick={goToNextStage}
+                className="w-full py-4 bg-cyan-500 text-white text-sm md:text-base font-black font-orbitron hover:bg-cyan-400 transition-all shadow-xl italic tracking-tighter"
+              >
+                NEXT PHASE
+              </button>
+              <button
+                onClick={restartCurrentStage}
+                className="w-full py-4 bg-white text-[#05060a] text-sm md:text-base font-black font-orbitron hover:bg-gray-100 transition-all shadow-xl italic tracking-tighter"
+              >
+                RESTART PHASE
+              </button>
+              <button
+                onClick={quitToMenu}
+                className="w-full py-4 bg-transparent border border-white/40 text-xs md:text-sm font-black font-orbitron hover:bg-white/10 transition-all shadow-xl italic tracking-[0.2em]"
+              >
+                RETURN TO MENU
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {gameStarted && (
         <>
           <Canvas 
@@ -130,13 +203,14 @@ const App: React.FC = () => {
             <ParkourGame 
               isPaused={isPaused} 
               onUpdateStats={(s) => setStats({...s, stage})} 
-              onFinish={handleNextStage}
+              onFinish={handleStageComplete}
               joystickData={joystickData}
               theme={settings.theme}
               difficulty={settings.difficulty}
               characterStyle={settings.characterStyle}
               pov={settings.pov}
               stage={stage}
+              runId={runId}
             />
 
             {!settings.mobileControls && (
@@ -152,6 +226,9 @@ const App: React.FC = () => {
             isPaused={isPaused} 
             mobile={settings.mobileControls} 
             onResume={requestLock} 
+            onPause={() => setIsPaused(true)}
+            onRestart={restartCurrentStage}
+            onQuitToMenu={quitToMenu}
             onJoystickUpdate={setJoystickData}
             onJumpPress={handleMobileJump}
             onSuperJumpPress={handleMobileSuperJump}
@@ -159,17 +236,34 @@ const App: React.FC = () => {
             currentPOV={settings.pov}
           />
           
-          {isPaused && (
-            <div className="absolute inset-0 z-40 bg-black/40 backdrop-blur-md flex items-center justify-center p-8 pointer-events-auto" onClick={requestLock}>
-              <div className="text-white text-center p-12 bg-[#1a1a1a] shadow-2xl border-b-8 border-cyan-500 w-full max-w-md rounded-lg">
+          {isPaused && gameStarted && !showStageComplete && (
+            <div className="absolute inset-0 z-30 bg-black/40 backdrop-blur-md flex items-center justify-center p-8 pointer-events-auto" onClick={requestLock}>
+              <div
+                className="text-white text-center p-12 bg-[#1a1a1a] shadow-2xl border-b-8 border-cyan-500 w-full max-w-md rounded-lg space-y-6"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <h2 className="text-5xl font-orbitron font-black mb-4 italic tracking-tighter">PAUSED</h2>
-                <p className="text-xs text-gray-500 mb-8 uppercase tracking-widest">Click to Resume Sync</p>
-                <button 
-                  onClick={requestLock}
-                  className="w-full py-5 bg-cyan-500 text-white font-black font-orbitron text-xl hover:bg-cyan-400 transition-all"
-                >
-                  RESUME
-                </button>
+                <p className="text-xs text-gray-500 mb-4 uppercase tracking-widest">Adjust your route or relock to continue</p>
+                <div className="space-y-3">
+                  <button 
+                    onClick={requestLock}
+                    className="w-full py-4 bg-cyan-500 text-white font-black font-orbitron text-lg hover:bg-cyan-400 transition-all"
+                  >
+                    RESUME RUN
+                  </button>
+                  <button
+                    onClick={restartCurrentStage}
+                    className="w-full py-3 bg-white text-[#1a1a1a] font-black font-orbitron text-sm hover:bg-gray-100 transition-all"
+                  >
+                    RESTART PHASE
+                  </button>
+                  <button
+                    onClick={quitToMenu}
+                    className="w-full py-3 bg-transparent border border-white/30 text-xs font-black font-orbitron hover:bg-white/10 transition-all tracking-[0.2em]"
+                  >
+                    RETURN TO MENU
+                  </button>
+                </div>
               </div>
             </div>
           )}

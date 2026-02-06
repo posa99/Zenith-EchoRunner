@@ -7,6 +7,9 @@ interface HUDProps {
   isPaused: boolean;
   mobile: boolean;
   onResume: () => void;
+  onPause?: () => void;
+  onRestart?: () => void;
+  onQuitToMenu?: () => void;
   onJoystickUpdate?: (data: { x: number; y: number } | null) => void;
   onJumpPress?: () => void;
   onSuperJumpPress?: () => void;
@@ -14,7 +17,20 @@ interface HUDProps {
   currentPOV?: CameraPOV;
 }
 
-const HUD: React.FC<HUDProps> = ({ stats, isPaused, mobile, onResume, onJoystickUpdate, onJumpPress, onSuperJumpPress, onPOVChange, currentPOV }) => {
+const HUD: React.FC<HUDProps> = ({
+  stats,
+  isPaused,
+  mobile,
+  onResume,
+  onPause,
+  onRestart,
+  onQuitToMenu,
+  onJoystickUpdate,
+  onJumpPress,
+  onSuperJumpPress,
+  onPOVChange,
+  currentPOV
+}) => {
   const speedKmh = Math.floor(stats.speed * 3.6);
   const flowProgress = Math.min((stats.speed / 55) * 100, 100);
   const isExtreme = stats.speed > 45;
@@ -51,25 +67,46 @@ const HUD: React.FC<HUDProps> = ({ stats, isPaused, mobile, onResume, onJoystick
   };
 
   return (
-    <div className="absolute inset-0 pointer-events-none p-4 md:p-8 flex flex-col justify-between text-[#1a1a1a] font-orbitron select-none">
+    <div className="absolute inset-0 pointer-events-none p-3 sm:p-4 md:p-8 flex flex-col justify-between text-[#1a1a1a] font-orbitron select-none">
       
       {/* Top Section */}
       <div className="flex justify-between items-start z-10">
-        <div className="flex flex-col gap-2">
-           <div className="bg-white/95 px-5 py-2 border-l-4 border-cyan-500 shadow-2xl rounded-sm">
-             <div className="text-[10px] text-cyan-600 font-black mb-1 tracking-widest uppercase">Stage Progression</div>
-             <div className="flex items-baseline gap-2">
-               <span className="text-4xl font-black italic tracking-tighter">PHASE {stats.stage}</span>
-               <span className="text-xl font-black italic tabular-nums opacity-60">{stats.time.toFixed(1)}s</span>
+        <div className="flex flex-col gap-2 max-w-xs sm:max-w-sm">
+           <div className="bg-white/95 px-3 sm:px-5 py-2 border-l-4 border-cyan-500 shadow-2xl rounded-sm">
+             <div className="text-[9px] sm:text-[10px] text-cyan-600 font-black mb-1 tracking-[0.3em] sm:tracking-widest uppercase">Stage Progression</div>
+             <div className="flex flex-wrap items-baseline gap-1 sm:gap-2">
+               <span className="text-2xl sm:text-3xl md:text-4xl font-black italic tracking-tighter">PHASE {stats.stage}</span>
+               <span className="text-sm sm:text-base md:text-xl font-black italic tabular-nums opacity-60">{stats.time.toFixed(1)}s</span>
              </div>
            </div>
            
            <button 
              onClick={onPOVChange}
-             className="pointer-events-auto bg-black text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-cyan-500 transition-colors shadow-lg"
+             className="pointer-events-auto bg-black text-white px-3 sm:px-4 py-2 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-widest hover:bg-cyan-500 transition-colors shadow-lg"
            >
              POV: {currentPOV === CameraPOV.FIRST_PERSON ? 'FIRST' : 'THIRD'} [V]
            </button>
+
+           <div className="flex gap-1 sm:gap-2 mt-1 pointer-events-auto">
+             <button
+               onClick={onPause}
+               className="px-2 sm:px-3 py-1 bg-white/90 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.25em] sm:tracking-[0.3em] border border-gray-200 hover:border-cyan-500 hover:text-cyan-600 transition-colors shadow-sm"
+             >
+               PAUSE
+             </button>
+             <button
+               onClick={onRestart}
+               className="px-2 sm:px-3 py-1 bg-white/90 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.25em] sm:tracking-[0.3em] border border-gray-200 hover:border-pink-500 hover:text-pink-600 transition-colors shadow-sm"
+             >
+               RESET
+             </button>
+             <button
+               onClick={onQuitToMenu}
+               className="px-2 sm:px-3 py-1 bg-black/90 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.25em] sm:tracking-[0.3em] text-white hover:bg-black transition-colors shadow-sm"
+             >
+               MENU
+             </button>
+           </div>
         </div>
 
         <div className="flex flex-col items-end gap-2">
